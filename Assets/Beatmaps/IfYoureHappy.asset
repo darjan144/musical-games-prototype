@@ -1,0 +1,55 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65b2054232f082d41b28a9dd6a1c1a80, type: 3}
+  m_Name: IfYoureHappy
+  m_EditorClassIdentifier: Assembly-CSharp::Beatmap
+  clip: {fileID: 8300000, guid: 8af7f4f1ae32d80478207b41857ff8e0, type: 3}
+  bpm: 125.01
+  firstBeatOffset: 0.09287982
+  approachSeconds: 2
+  hits:
+  - beat: 44
+  - beat: 45
+  - beat: 52
+  - beat: 53
+  - beat: 68
+  - beat: 69
+  - beat: 76
+  - beat: 77
+  - beat: 84
+  - beat: 85
+  - beat: 100
+  - beat: 101
+  - beat: 108
+  - beat: 109
+  - beat: 116
+  - beat: 117
+  - beat: 132
+  - beat: 133
+  - beat: 140
+  - beat: 141
+  - beat: 142
+  - beat: 143
+  - beat: 144.5
+  - beat: 145.5
+  - beat: 152
+  - beat: 153
+  - beat: 154
+  - beat: 155
+  - beat: 156
+  - beat: 157
+  - beat: 172
+  - beat: 173
+  - beat: 174
+  - beat: 175
+  - beat: 176
+  - beat: 177
