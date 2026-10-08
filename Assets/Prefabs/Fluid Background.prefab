@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &7124376393136364341
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 9105110398492452458}
+  - component: {fileID: 785290249105555656}
+  m_Layer: 0
+  m_Name: Fluid Background
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &9105110398492452458
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7124376393136364341}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &785290249105555656
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7124376393136364341}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a3c5e7b1d2f4a6c8e0b2d4f6a8c0e1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FluidSimulation
+  simulationShader: {fileID: 4800000, guid: 7c1e4a9b3f5d4e2a8b6c0d1f2e3a4b5c, type: 3}
+  displayShader: {fileID: 4800000, guid: 2d8f6b1a9c4e4f7d8a3b5c6e7f0a1b2d, type: 3}
+  simResolution: 128
+  dyeResolution: 1024
+  pressureIterations: 20
+  densityDissipation: 1
+  velocityDissipation: 0.2
+  pressure: 0.8
+  curl: 30
+  splatRadius: 0.25
+  splatForce: 6000
+  pointerInput: 1
+  colorUpdateSpeed: 10
+  startSplats: {x: 5, y: 25}
+  shading: 1
+  backColor: {r: 0, g: 0, b: 0, a: 1}
+  sortingOrder: -1000

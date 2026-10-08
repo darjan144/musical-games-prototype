@@ -13,7 +13,7 @@ Unity prototype of three short musical games for young children, played on a **T
 
 ## Target structure
 
-Four scenes, all in Build Settings (as of 2026-10-07 only `SampleScene` exists):
+Four scenes, all in Build Settings, `MainMenu` first. Scene changes go through `SceneLoader.Instance.Load(name)` (self-creating singleton); UI buttons use the `SceneButton` component:
 
 | Scene | Purpose |
 |---|---|
@@ -26,7 +26,7 @@ Code layout (create the rest as needed, don't scaffold ahead):
 
 ```
 Assets/Scripts/
-  Core/      shared: AudioManager (exists); Tomplay input, note mapping, scene loading (planned)
+  Core/      shared: AudioManager, SceneLoader + SceneButton, TomplayInput (key list only so far; note mapping planned)
   Rhythm/    Beatmap, SongClock, RhythmCircle, RhythmGame; Editor/ has BeatmapAnalyzer + Beatmap inspector
   Menu/ Melody/ Harmony/   (planned)
 Assets/Beatmaps/           one Beatmap asset per song
@@ -62,11 +62,11 @@ Goal: pulse awareness, timing-based cause and effect.
 - Stage 3: the required rhythm follows a familiar song (e.g. "If You're Happy and You Know It"); on completion the full song plays with a celebration animation.
 - Inspiration is **osu!**, but only one mechanic: an approach circle shrinks onto a target, and the moment it meets the target is when to press. No cursor aiming, sliders, spinners, score or fail.
 - Six target circles in a row at fixed positions (the song's longest run is six claps one beat apart). **No mouse, no aiming.**
-- **Input is the `Z` key only**, hardcoded for now (this overrides the brief's "any key").
-- **No graded hit windows** (no perfect/good/late, no score). A press either counts for the current circle → small positive feedback, or the circle just fades. Nothing negative is ever shown.
+- **Input is any of the 36 Tomplay keys** (pitch ignored), via `TomplayInput.AnyKeyPressedThisFrame()` in Core.
+- **No score, no late/miss feedback.** A press either counts for the current circle → small positive feedback, or the circle just fades. A press within `perfectWindowSeconds` of the ring closing (on `RhythmGame`) gets a bigger celebration (ring burst + pastel dots, on `RhythmCircle`). Nothing negative is ever shown.
 - Song: "If You're Happy and You Know It". Audio in `Assets/Sounds/rhythm/`: the instrumental mp3 (ripped from YouTube — placeholder, not cleared for release) and `clap.mp3` (royalty-free hit sound).
 - Each song has a **beatmap asset** (tempo, first-beat offset, hit times in beats, approach time). Tempo/offset come from the "Analyze tempo from clip" button on the asset. The game reads only the clip and its asset; no external chart formats.
-- Hits can be re-authored by ear: tick `Record Hits` on the `RhythmGame` component, press Play, tap Z through the song; the taps replace the beatmap's hits when the song ends or Play mode stops.
+- Hits can be re-authored by ear: tick `Record Hits` on the `RhythmGame` component, press Play, tap any piano key through the song; the taps replace the beatmap's hits when the song ends or Play mode stops.
 - A press pops the earliest circle currently on screen. Layout is automatic: hits that can be on screen together (gap ≤ approach + linger) form a group, and each group is shown as a centred row with one circle per hit (2 claps → 2 circles in the middle, 6 claps → the full row). A circle is never restarted while it is still showing; a group longer than the row continues in a new row once the current rings have closed.
 - The song starts only from the on-screen start button (user's choice; the click also unlocks browser audio). No "press anything to start".
 - Build order agreed with the user: the song with clap circles first (done as a first pass), then the pulse tutorial stage in front of it, then the rest of the stage flow.

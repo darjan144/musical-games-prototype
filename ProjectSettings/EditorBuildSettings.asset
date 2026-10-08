@@ -6,8 +6,17 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/MainMenu.unity
+    guid: c07d2ec1637a0ee4d82501b972289a5c
+  - enabled: 1
     path: Assets/Scenes/Game1_Rhythm.unity
     guid: 4bb5306cb3af18b4a8dc2ace0211c0ab
+  - enabled: 1
+    path: Assets/Scenes/Game2_Melody.unity
+    guid: d42a5c62a0c3d5941817b8d514272fad
+  - enabled: 1
+    path: Assets/Scenes/Game3_Harmony.unity
+    guid: ef33a404f29c23b44b62b8e70ca51844
   m_configObjects:
     com.unity.dt.app-ui: {fileID: 11400000, guid: 1b1c20d82303e4b5781c3ef50ac1449f, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}

@@ -1,11 +1,10 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 /// <summary>
-/// Game 1. The start button plays the beatmap's song; each hit gets a circle, and Z pops the earliest circle on screen.
-/// There is no timing judgement: a press counts if a circle is showing, otherwise nothing happens.
+/// Game 1. The start button plays the beatmap's song; each hit gets a circle, and any piano key pops the earliest circle on screen.
+/// A press counts if a circle is showing, otherwise nothing happens. A well-timed press gets a bigger celebration; nothing is ever marked wrong.
 /// Hits that can be on screen together form a group, and each group is laid out as a centred row.
 /// </summary>
 public class RhythmGame : MonoBehaviour
@@ -18,9 +17,11 @@ public class RhythmGame : MonoBehaviour
     [SerializeField] AudioClip hitSound;
     [Tooltip("How long a circle stays after its ring has closed before it fades away.")]
     [SerializeField] float lingerSeconds = 0.5f;
+    [Tooltip("A press this close to the ring closing (before or after, seconds) gets the bigger celebration. Other presses still count.")]
+    [SerializeField, Min(0f)] float perfectWindowSeconds = 0.2f;
 
     [Header("Authoring (editor only)")]
-    [Tooltip("Play the song and tap Z where the hits belong. They replace the beatmap's hits when the song ends or Play mode stops.")]
+    [Tooltip("Play the song and tap any piano key where the hits belong. They replace the beatmap's hits when the song ends or Play mode stops.")]
     [SerializeField] bool recordHits;
     [Tooltip("Recorded taps snap to this fraction of a beat.")]
     [SerializeField] float recordSnap = 0.5f;
@@ -56,7 +57,7 @@ public class RhythmGame : MonoBehaviour
     {
         if (!started) return;
 
-        bool pressed = Keyboard.current != null && Keyboard.current.zKey.wasPressedThisFrame;
+        bool pressed = TomplayInput.AnyKeyPressedThisFrame();
 
         if (!clock.IsPlaying)
         {
@@ -103,7 +104,8 @@ public class RhythmGame : MonoBehaviour
 
         if (pressed && showing.Count > 0)
         {
-            showing[0].Hit();
+            bool perfect = Mathf.Abs(now - showing[0].HitTime) <= perfectWindowSeconds;
+            showing[0].Hit(perfect);
             showing.RemoveAt(0);
             AudioManager.Instance.PlaySfx(hitSound);
         }
