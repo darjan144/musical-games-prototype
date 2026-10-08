@@ -26,6 +26,13 @@ public static class TomplayInput
         return keyboard != null && keyboard[key].isPressed;
     }
 
+    /// <summary>True on the frame the key goes down.</summary>
+    public static bool WasPressedThisFrame(Key key)
+    {
+        var keyboard = Keyboard.current;
+        return keyboard != null && keyboard[key].wasPressedThisFrame;
+    }
+
     /// <summary>True on the frame any piano key goes down, whatever its pitch.</summary>
     public static bool AnyKeyPressedThisFrame()
     {

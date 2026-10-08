@@ -28,7 +28,9 @@ Code layout (create the rest as needed, don't scaffold ahead):
 Assets/Scripts/
   Core/      shared: AudioManager, SceneLoader + SceneButton, TomplayInput (key list only so far; note mapping planned)
   Rhythm/    Beatmap, SongClock, RhythmCircle, RhythmGame; Editor/ has BeatmapAnalyzer + Beatmap inspector
-  Menu/ Melody/ Harmony/   (planned)
+  Melody/    MelodyGame, ScrollingBackground, BirdAnimation
+  Harmony/   HarmonyGame
+  Menu/      (planned)
 Assets/Beatmaps/           one Beatmap asset per song
 ```
 
@@ -74,8 +76,13 @@ Goal: pulse awareness, timing-based cause and effect.
 
 ### Game 2 — Melody
 Goal: connect pitch (low/middle/high) with position (bottom/middle/top).
-- A character collects items at three heights (e.g. apple on the ground, bird on the trunk, star at the treetop).
-- Only three notes matter: **C = low/bottom, E = middle, G = high/top**. Playing the note moves the character to that height and sounds the note.
+- Side-scroller (user's design, 2026-10-08): the character stays on the left while the `parallaxmountain` layers scroll right to left (`ScrollingBackground`, tiled sprites; far layers slower).
+- Keys: **A = C = low level, D = E = middle, G = G = high** (`TomplayInput.MiddleC/E/G`), **held**. With nothing held the character falls (gravity, hand-rolled in `MelodyGame`, no Rigidbody) to the ground, which is below the low level and collects nothing. While it rests on the ground with nothing held, the background and items ease to a stop (`speedChangeSeconds`), so nothing is missed while the child waits.
+- Items (pooled with `UnityEngine.Pool.ObjectPool`, prefab `Assets/Prefabs/Melody Item.prefab`) arrive from the right on the three levels and are collected by proximity (`collectRadius`). Missed items just leave. Goal: `goal` items (50), shown on the fill bar; then a short celebration and a new round.
+- Spawning is in phrases: a row of 3–5 on one level (levels drawn from a shuffled bag so all three come round), or a staircase through all three. `levelChangeGap` is the time the child gets to change note.
+- The character is the user's animated bird (`Assets/Birds`, `Assets/Animation/BirdAnimController`, triggers `ToIdle` / `ToFly`). `BirdAnimation.SetFlying` is called by `MelodyGame`: Idle only while resting on the ground, Fly whenever in the air (falling included). The item is a code-drawn placeholder star in `Assets/Art/Melody`.
+- The only on-screen text is "Controls: A, D, G to fly!" (user's wording). Don't explain the levels; the child works them out.
+- No note sounds from the game so far (the piano makes its own); only a pop on collect.
 
 ### Game 3 — Harmony
 Goal: collaboration and building a chord together.
