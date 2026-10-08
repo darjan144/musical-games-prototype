@@ -79,9 +79,13 @@ Goal: connect pitch (low/middle/high) with position (bottom/middle/top).
 
 ### Game 3 — Harmony
 Goal: collaboration and building a chord together.
-- Starts with an empty scene (a seed in soil). Needs 2–3 children.
-- Hold C → note sustains, a stem grows. Hold E as well → harmony, leaves appear. Add G → full chord, flower blooms and glows.
-- Notes sound only while held; releasing a key should visibly/audibly step back.
+- Starts with an empty (black) scene. Needs 2–3 children.
+- The brief's flower (stem → leaves → bloom) is replaced by the **fluid simulation** (user's decision, 2026-10-08): each held note pours its own colour into the fluid from its own place at the bottom of the screen (C left, E middle, G right), swaying slowly while held. All three held → the streams lean over to the centre, where an extra `chordColor` (picked by hand on the component) is stirred in.
+- **Low stimulus, warm and fuzzy** (user's call, seizure safety): warm pastel colours (rose, amber, lilac; gold centre), everything eases in/out (`fadeSeconds`, `chordBlendSeconds`), sway ≤ ~1 Hz, slow stir, low dye so nothing burns out to white. Never add fast repeating motion, flashes or hard pop-ins here.
+- Keys: **A = C, D = E, G = G** (middle octave only; `TomplayInput.MiddleC/E/G`). `HarmonyGame` (Scripts/Harmony) calls `FluidSimulation.Splat` every frame for each held note; everything is tunable on the component.
+- **The game plays no sound** — the Tomplay keyboard makes its own.
+- Releasing a key stops that colour; what is on screen fades by the fluid's density dissipation.
+- In this scene the `Fluid Background` instance is overridden: start splats and pointer input off (only notes add colour), and softened (shading off, curl 5, splat radius 0.5, velocity dissipation 0.6, dye resolution 512, warm dark back colour).
 - No theory text on screen ("C Major Chord" etc.) — reward is purely sensory.
 
 ## Design constraints (all games)

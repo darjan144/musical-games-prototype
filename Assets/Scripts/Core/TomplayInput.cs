@@ -14,6 +14,18 @@ public static class TomplayInput
         Key.Q, Key.I, Key.W, Key.O, Key.E, Key.R, Key.P, Key.T, Key.K, Key.Y, Key.L, Key.U,
     };
 
+    // The middle octave's C major chord.
+    public const Key MiddleC = Key.A;
+    public const Key MiddleE = Key.D;
+    public const Key MiddleG = Key.G;
+
+    /// <summary>True for as long as the key is down.</summary>
+    public static bool IsHeld(Key key)
+    {
+        var keyboard = Keyboard.current;
+        return keyboard != null && keyboard[key].isPressed;
+    }
+
     /// <summary>True on the frame any piano key goes down, whatever its pitch.</summary>
     public static bool AnyKeyPressedThisFrame()
     {

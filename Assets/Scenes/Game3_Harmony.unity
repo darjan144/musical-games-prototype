@@ -607,6 +607,50 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 785290249105555656, guid: 5a6d9a4c0f055ab4792916a916c07ee3, type: 3}
+      propertyPath: curl
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 785290249105555656, guid: 5a6d9a4c0f055ab4792916a916c07ee3, type: 3}
+      propertyPath: shading
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 785290249105555656, guid: 5a6d9a4c0f055ab4792916a916c07ee3, type: 3}
+      propertyPath: backColor.b
+      value: 0.08
+      objectReference: {fileID: 0}
+    - target: {fileID: 785290249105555656, guid: 5a6d9a4c0f055ab4792916a916c07ee3, type: 3}
+      propertyPath: backColor.g
+      value: 0.06
+      objectReference: {fileID: 0}
+    - target: {fileID: 785290249105555656, guid: 5a6d9a4c0f055ab4792916a916c07ee3, type: 3}
+      propertyPath: backColor.r
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 785290249105555656, guid: 5a6d9a4c0f055ab4792916a916c07ee3, type: 3}
+      propertyPath: splatRadius
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 785290249105555656, guid: 5a6d9a4c0f055ab4792916a916c07ee3, type: 3}
+      propertyPath: pointerInput
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 785290249105555656, guid: 5a6d9a4c0f055ab4792916a916c07ee3, type: 3}
+      propertyPath: dyeResolution
+      value: 512
+      objectReference: {fileID: 0}
+    - target: {fileID: 785290249105555656, guid: 5a6d9a4c0f055ab4792916a916c07ee3, type: 3}
+      propertyPath: startSplats.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 785290249105555656, guid: 5a6d9a4c0f055ab4792916a916c07ee3, type: 3}
+      propertyPath: startSplats.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 785290249105555656, guid: 5a6d9a4c0f055ab4792916a916c07ee3, type: 3}
+      propertyPath: velocityDissipation
+      value: 0.6
+      objectReference: {fileID: 0}
     - target: {fileID: 7124376393136364341, guid: 5a6d9a4c0f055ab4792916a916c07ee3, type: 3}
       propertyPath: m_Name
       value: Fluid Background
@@ -656,6 +700,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5a6d9a4c0f055ab4792916a916c07ee3, type: 3}
+--- !u!114 &1156793080 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 785290249105555656, guid: 5a6d9a4c0f055ab4792916a916c07ee3, type: 3}
+  m_PrefabInstance: {fileID: 1156793079}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a3c5e7b1d2f4a6c8e0b2d4f6a8c0e1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FluidSimulation
 --- !u!1 &1175123547
 GameObject:
   m_ObjectHideFlags: 0
@@ -831,6 +886,72 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1359640891}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1365682475
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1365682477}
+  - component: {fileID: 1365682476}
+  m_Layer: 0
+  m_Name: HarmonyGame
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1365682476
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1365682475}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ebb3d84cbb4ddff4ab9a6a839e927f3d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HarmonyGame
+  fluid: {fileID: 1156793080}
+  voices:
+  - color: {r: 1, g: 0.42, b: 0.4, a: 1}
+    source: {x: 0.17, y: 0.1}
+  - color: {r: 1, g: 0.74, b: 0.3, a: 1}
+    source: {x: 0.5, y: 0.1}
+  - color: {r: 0.8, g: 0.5, b: 0.95, a: 1}
+    source: {x: 0.83, y: 0.1}
+  releaseGraceSeconds: 0.08
+  fadeSeconds: 0.6
+  dyeStrength: 0.07
+  pushStrength: 14
+  vibrationHz: 1.2
+  vibrationSize: 0.02
+  vibrationWag: 0.3
+  centre: {x: 0.5, y: 0.55}
+  chordColor: {r: 0.495283, g: 1, b: 0.9486475, a: 1}
+  chordDyeStrength: 0.1
+  chordBlendSeconds: 1.5
+  chordSwirlStrength: 10
+  chordRadius: 0.06
+  chordSpinHz: 0.15
+--- !u!4 &1365682477
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1365682475}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -1146,7 +1267,7 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
+    rgba: 4284235311
   m_fontColor: {r: 0.184, g: 0.243, b: 0.361, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
@@ -1159,7 +1280,7 @@ MonoBehaviour:
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: 0
+  m_TextStyleHashCode: -1183493901
   m_overrideHtmlColors: 0
   m_faceColor:
     serializedVersion: 2
@@ -1227,3 +1348,4 @@ SceneRoots:
   - {fileID: 1359640893}
   - {fileID: 644383244}
   - {fileID: 1156793079}
+  - {fileID: 1365682477}
