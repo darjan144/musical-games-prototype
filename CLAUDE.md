@@ -28,7 +28,7 @@ Code layout (create the rest as needed, don't scaffold ahead):
 Assets/Scripts/
   Core/      shared: AudioManager, SceneLoader + SceneButton, TomplayInput (key list only so far; note mapping planned)
   Rhythm/    Beatmap, SongClock, RhythmCircle, RhythmGame; Editor/ has BeatmapAnalyzer + Beatmap inspector
-  Melody/    MelodyGame, ScrollingBackground, BirdAnimation
+  Melody/    MelodyGame, ScrollingBackground, BirdAnimation, NoteTrail
   Harmony/   HarmonyGame
   Menu/      (planned)
 Assets/Beatmaps/           one Beatmap asset per song
@@ -81,6 +81,8 @@ Goal: connect pitch (low/middle/high) with position (bottom/middle/top).
 - Items (pooled with `UnityEngine.Pool.ObjectPool`, prefab `Assets/Prefabs/Melody Item.prefab`) arrive from the right on the three levels and are collected by proximity (`collectRadius`). Missed items just leave. Goal: `goal` items (50), shown on the fill bar; then a short celebration and a new round.
 - Spawning is in phrases: a row of 3–5 on one level (levels drawn from a shuffled bag so all three come round), or a staircase through all three. `levelChangeGap` is the time the child gets to change note.
 - The character is the user's animated bird (`Assets/Birds`, `Assets/Animation/BirdAnimController`, triggers `ToIdle` / `ToFly`). `BirdAnimation.SetFlying` is called by `MelodyGame`: Idle only while resting on the ground, Fly whenever in the air (falling included). The item is a code-drawn placeholder star in `Assets/Art/Melody`.
+- `NoteTrail` (object `Note Trail`, three particle systems) streams little note pictures out behind the bird while a note is held: C = rose crotchet, E = amber quaver, G = lilac beamed pair (code-drawn `note_C/E/G.png` in `Assets/Art/Melody`, same colours as Game 3). Particles get the scroll speed to the left because the bird never moves in x.
+- Long notes (Guitar Hero sustain, user's idea): `longNoteChance` of the rows become one ribbon as long as the row would have been, with a single star at its end (`Assets/Prefabs/Melody Long Note.prefab`, pooled LineRenderer). Flying along the ribbon eats it from the front; the star is collected as usual and counts as one. A ribbon that is missed just scrolls past. Half of the long notes (`comboChance`) come with one or two single stars on the same level just before or after, and a staircase can end on a long note.
 - The only on-screen text is "Controls: A, D, G to fly!" (user's wording). Don't explain the levels; the child works them out.
 - No note sounds from the game so far (the piano makes its own); only a pop on collect.
 

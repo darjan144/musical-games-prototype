@@ -19,7 +19,11 @@ public class MelodyGame : MonoBehaviour
     [SerializeField] Transform character;
     [Tooltip("Optional. Told whether the character is in the air or on the ground.")]
     [SerializeField] BirdAnimation bird;
+    [Tooltip("Optional. The little notes that stream out behind the character while a note is held.")]
+    [SerializeField] NoteTrail noteTrail;
     [SerializeField] SpriteRenderer itemPrefab;
+    [Tooltip("The ribbon in front of a long note's star: a LineRenderer with two points, in world space.")]
+    [SerializeField] LineRenderer longNotePrefab;
     [Tooltip("Optional. A Filled image that fills up as items are collected.")]
     [SerializeField] Image progressFill;
     [SerializeField] AudioClip collectSound;
@@ -57,16 +61,37 @@ public class MelodyGame : MonoBehaviour
     [SerializeField, Range(0f, 1f)] float stairsChance = 0.35f;
     [Tooltip("Items on each step of a staircase.")]
     [SerializeField, Min(1)] int stairStepLength = 2;
+    [Tooltip("How often a row is replaced by a long note: a ribbon as long as the row, eaten up by flying along it, with one star at its end.")]
+    [SerializeField, Range(0f, 1f)] float longNoteChance = 0.65f;
+    [Tooltip("How often a long note comes with one or two single stars on the same level, just before or just after it.")]
+    [SerializeField, Range(0f, 1f)] float comboChance = 0.5f;
 
     [Header("Round end")]
     [Tooltip("How long the celebration lasts before a new round starts.")]
     [SerializeField, Min(0f)] float celebrationSeconds = 4f;
 
+    // The next items, in order. ribbon is the length of the ribbon in front of the item; 0 for a plain star.
+    struct Upcoming
+    {
+        public int level;
+        public float ribbon;
+    }
+
+    // A ribbon on screen. It ends at its star; left is the x of its other end, which the character eats away.
+    struct LongNote
+    {
+        public LineRenderer ribbon;
+        public SpriteRenderer star;
+        public float left;
+    }
+
     static readonly Key[] NoteKeys = { TomplayInput.MiddleC, TomplayInput.MiddleE, TomplayInput.MiddleG };
 
     ObjectPool<SpriteRenderer> pool;
     readonly List<SpriteRenderer> items = new List<SpriteRenderer>();
-    readonly Queue<int> upcoming = new Queue<int>();   // levels of the next items, in order
+    readonly Queue<Upcoming> upcoming = new Queue<Upcoming>();
+    ObjectPool<LineRenderer> ribbonPool;
+    readonly List<LongNote> longNotes = new List<LongNote>();
     readonly List<int> levelBag = new List<int>();
 
     readonly float[] lastHeldTime = new float[NoteKeys.Length];
@@ -77,6 +102,7 @@ public class MelodyGame : MonoBehaviour
     Vector3 itemScale;
     Color itemColor;
     float velocityY;
+    int heldLevel = -1;
     bool resting;
     float currentSpeed;
     float distanceToNextItem;
@@ -97,6 +123,11 @@ public class MelodyGame : MonoBehaviour
             item => item.gameObject.SetActive(true),
             item => item.gameObject.SetActive(false),
             item => Destroy(item.gameObject));
+        ribbonPool = new ObjectPool<LineRenderer>(
+            () => Instantiate(longNotePrefab, transform),
+            ribbon => ribbon.gameObject.SetActive(true),
+            ribbon => ribbon.gameObject.SetActive(false),
+            ribbon => Destroy(ribbon.gameObject));
 
         var position = character.position;
         position.y = groundY;
@@ -111,6 +142,8 @@ public class MelodyGame : MonoBehaviour
         MoveCharacter(dt);
         // In the air is flying, whether rising to a note or falling with nothing held.
         if (bird != null) bird.SetFlying(!resting);
+        // The notes always drift away at full speed, so they still clear once the bird has landed and the world has stopped.
+        if (noteTrail != null) noteTrail.Show(heldLevel, scrollSpeed);
 
         // Resting on the ground with no note held pauses the world, so nothing is missed while the child waits.
         float targetSpeed = resting ? 0f : scrollSpeed;
@@ -119,6 +152,7 @@ public class MelodyGame : MonoBehaviour
 
         background.Scroll(distance);
         MoveItems(distance);
+        MoveLongNotes(distance);
 
         if (celebrationLeft > 0f)
         {
@@ -156,7 +190,7 @@ public class MelodyGame : MonoBehaviour
     void MoveCharacter(float dt)
     {
         var position = character.position;
-        int level = HeldLevel();
+        int level = heldLevel = HeldLevel();
         resting = false;
         if (level >= 0)
         {
@@ -189,13 +223,47 @@ public class MelodyGame : MonoBehaviour
             if (Vector2.Distance(item.transform.position, characterPosition) <= collectRadius)
             {
                 items.RemoveAt(i);
+                EndLongNote(item);
                 Collect(item);
             }
             else if (item.transform.position.x < leftEdge)
             {
                 items.RemoveAt(i);
+                EndLongNote(item);
                 pool.Release(item);
             }
+        }
+    }
+
+    // Ribbons travel with their stars. Flying along one eats it from the front, so it shrinks towards its star.
+    void MoveLongNotes(float distance)
+    {
+        Vector2 characterPosition = character.position;
+
+        for (int i = 0; i < longNotes.Count; i++)
+        {
+            var note = longNotes[i];
+            Vector3 end = note.star.transform.position;
+            note.left -= distance;
+
+            bool onLevel = Mathf.Abs(characterPosition.y - end.y) <= collectRadius;
+            if (onLevel && note.left < characterPosition.x) note.left = Mathf.Min(characterPosition.x, end.x);
+
+            note.ribbon.SetPosition(0, new Vector3(note.left, end.y, end.z));
+            note.ribbon.SetPosition(1, end);
+            longNotes[i] = note;
+        }
+    }
+
+    // Takes away the ribbon that leads to this star, if it has one.
+    void EndLongNote(SpriteRenderer star)
+    {
+        for (int i = 0; i < longNotes.Count; i++)
+        {
+            if (longNotes[i].star != star) continue;
+            ribbonPool.Release(longNotes[i].ribbon);
+            longNotes.RemoveAt(i);
+            return;
         }
     }
 
@@ -207,22 +275,32 @@ public class MelodyGame : MonoBehaviour
         while (distanceToNextItem <= 0f)
         {
             if (upcoming.Count == 0) QueuePhrase();
-            int level = upcoming.Dequeue();
+            var next = upcoming.Dequeue();
 
+            // distanceToNextItem is how far past the edge this item already should be, which keeps the spacing exact.
+            // A long note's ribbon starts there and its star comes at the far end.
+            float x = rightEdge + distanceToNextItem;
             var item = pool.Get();
             item.transform.localScale = itemScale;
             item.color = itemColor;
-            // distanceToNextItem is how far past the edge this item already should be, which keeps the spacing exact.
-            item.transform.position = new Vector3(rightEdge + distanceToNextItem, levelHeights[level], 0f);
+            item.transform.position = new Vector3(x + next.ribbon, levelHeights[next.level], 0f);
             items.Add(item);
-            lastLevel = level;
+            lastLevel = next.level;
+
+            if (next.ribbon > 0f)
+            {
+                var ribbon = ribbonPool.Get();
+                ribbon.SetPosition(0, new Vector3(x, levelHeights[next.level], 0f));
+                ribbon.SetPosition(1, item.transform.position);
+                longNotes.Add(new LongNote { ribbon = ribbon, star = item, left = x });
+            }
 
             if (upcoming.Count == 0) QueuePhrase();
-            distanceToNextItem += upcoming.Peek() == level ? itemSpacing : levelChangeGap;
+            distanceToNextItem += next.ribbon + (upcoming.Peek().level == next.level ? itemSpacing : levelChangeGap);
         }
     }
 
-    // Queues the next few items: a row on one level, or a staircase through all three.
+    // Queues the next few items: a row on one level, a long note in place of a row, or a staircase through all three.
     // Rows take their level from a shuffled bag of all the levels, so every level comes round before any repeats.
     void QueuePhrase()
     {
@@ -232,7 +310,12 @@ public class MelodyGame : MonoBehaviour
             for (int step = 0; step < levelHeights.Length; step++)
             {
                 int level = up ? step : levelHeights.Length - 1 - step;
-                for (int n = 0; n < stairStepLength; n++) upcoming.Enqueue(level);
+                // The last step can be a long note, so the staircase ends on a held note.
+                bool longStep = step == levelHeights.Length - 1 && Random.value < longNoteChance;
+                if (longStep)
+                    upcoming.Enqueue(new Upcoming { level = level, ribbon = (Random.Range(runLength.x, runLength.y + 1) - 1) * itemSpacing });
+                else
+                    QueueStars(level, stairStepLength);
             }
             lastPhraseWasStairs = true;
             return;
@@ -248,8 +331,25 @@ public class MelodyGame : MonoBehaviour
         levelBag.RemoveAt(pick);
 
         int count = Random.Range(runLength.x, runLength.y + 1);
-        for (int n = 0; n < count; n++) upcoming.Enqueue(rowLevel);
+        if (Random.value >= longNoteChance)
+        {
+            QueueStars(rowLevel, count);
+        }
+        else
+        {
+            // A long note, on its own or with a star or two on the same level just before or just after it.
+            int singles = Random.value < comboChance ? Random.Range(1, 3) : 0;
+            bool singlesFirst = Random.value < 0.5f;
+            if (singlesFirst) QueueStars(rowLevel, singles);
+            upcoming.Enqueue(new Upcoming { level = rowLevel, ribbon = (count - 1) * itemSpacing });
+            if (!singlesFirst) QueueStars(rowLevel, singles);
+        }
         lastPhraseWasStairs = false;
+    }
+
+    void QueueStars(int level, int count)
+    {
+        for (int n = 0; n < count; n++) upcoming.Enqueue(new Upcoming { level = level });
     }
 
     void Collect(SpriteRenderer item)
@@ -282,6 +382,8 @@ public class MelodyGame : MonoBehaviour
 
         foreach (var item in items) PopAway(item);
         items.Clear();
+        foreach (var note in longNotes) ribbonPool.Release(note.ribbon);
+        longNotes.Clear();
 
         character.DOLocalRotate(new Vector3(0f, 0f, -360f), 1.2f, RotateMode.FastBeyond360).SetEase(Ease.InOutSine).SetLoops(2);
         if (progressFill != null) progressFill.transform.DOPunchScale(Vector3.one * 0.15f, 1f, 3, 0.5f);
